@@ -11,7 +11,13 @@
 
 make code changes/suggestions
 
+`git status` : check changes overall (optional)
+
+`git diff` : check changes by line (optional)
+
 `git add .`
+
+`git diff --staged` : check changes after adding (optional)
 
 `git commit -m <message>` : commit your changes
 
