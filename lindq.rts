@@ -1,0 +1,43 @@
+"
+1. Daily bars
+2. Entry: Buy TQQQ at the open...if the open is 2% below the close 2 days prior...and if the close of the prior day was below a 5 period simple moving average...
+and if SPY was down the prior day...and if the day is not Friday.
+3. Exit: If the trade has gained 4% on the same day...or exit at the end of the same day if profit target has not been reached.
+
+no commissions, no slippage, 30k per trade
+"
+
+Import:
+	DataSource: Norgate //Yahoo
+	IncludeList: TQQQ, SPY
+	StartDate: 1/1/2010
+	EndDate: Latest
+	SaveAs: lindq.rtd
+	
+TestSettings:
+	StartDate: 1/1/2010
+	EndDate: Latest
+	DataFile: lindq.rtd
+	TestName: lindq
+	AccountSize: 30000
+//	BarSize: Daily
+
+"
+yesterday			1 (1 bar AGO)
+today (setup)			0 (current bar, most recently completed bar)
+tomorrow (entry)		-1
+"
+
+Strategy: lindq
+	QtyType: Value
+	Quantity: 30000
+//	Side: Long
+
+	EntrySetup: Symbol == $TQQQ and O[-1] <= C[1] * 0.98 and C < MA(C,5) and Extern($SPY, C < O) and DayOfWeek[-1] != 5
+//	EntryLimit: C[1] * 0.98
+//	EntryTime: AtOpen
+
+	ExitLimit: FillPrice * 1.04
+	ExitRule: 1
+	ExitTime: AtClose
+	
