@@ -20,7 +20,7 @@ TestSettings:
 	DataFile: lindq.rtd
 	TestName: lindq
 	AccountSize: 30000
-//	BarSize: Daily
+//	BarSize: Daily // default
 
 "
 yesterday			1 (1 bar AGO)
@@ -35,7 +35,7 @@ Strategy: lindq
 
 	EntrySetup: Symbol == $TQQQ and O[-1] <= C[1] * 0.98 and C < MA(C,5) and Extern($SPY, C < O) and DayOfWeek[-1] != 5
 //	EntryLimit: C[1] * 0.98
-//	EntryTime: AtOpen
+//	EntryTime: AtOpen // default
 
 	ExitLimit: FillPrice * 1.04
 	ExitRule: 1
