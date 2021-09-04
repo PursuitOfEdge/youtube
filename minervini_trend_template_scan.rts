@@ -1,0 +1,65 @@
+"""
+https://www.williamoneil.com/proprietary-ratings-and-rankings/
+RELATIVE STRENGTH RATING
+This technical tool is one of the most popular ways for clients to see the market’s top performers. The Relative Strength Rating is the result of calculating a stock’s percentage price change over the last 12 months.
+A 40% weight is assigned to the latest three-month period; the remaining three quarters each receive 20% weight.
+All stocks are arranged in order of greatest price percentage change and assigned a percentile rank from 99 (highest) to 1 (lowest).
+"""
+
+Import:
+	DataSource: Norgate
+	IncludeList: .Russell 3000 Current & Past
+	Constituency: $RUA
+	StartDate: 1/1/2020
+	EndDate: Latest
+	SaveAs: russell3000current.rtd
+
+ScanSettings:
+	NumDays: 1
+	EndDate: Latest
+	DataFile: russell3000current.rtd
+	UseAvailableBars: False
+	SaveScanAs: minerviniscan.csv
+
+Data:
+	Strength: 0.4*PctChg(C,63) + 0.2*PctChg(C,126) + 0.2*PctChg(C,189) + 0.2*PctChg(C,252)
+	RelativeStrength: #PercentRank Strength
+	IBDRS: 99/101 * RelativeStrength + 1
+	
+	MA50: MA(C,50)
+	MA150: MA(C,150)
+	MA200: MA(C,200)
+	WeekLow52: Lowest(L,252)
+	WeekHigh52: Highest(H,252)
+
+	// 1. The current stock price is above both the 150-day (30-week) and the 200-day (40-week) moving average price lines.
+	C1: C > MA150 and C > MA200
+	
+	// 2. The 150-day moving average is above the 200-day moving average.
+	C2: MA150 > MA200
+	
+	// 3. The 200-day moving average line is trending up for at least 1 month (preferably 4-5 months minimum in most cases).
+	C3: PctChg(MA200,21) > 0
+	
+	// 4. The 50-day (10-week) moving average is above both the 150-day and 200-day moving averages.
+	C4: MA50 > MA150 and MA50 > MA200
+	
+	// 5. The current stock price is trading above the 50-day moving average.
+	C5: C > MA50
+	
+	// 6. The current stock price is at least 30 percent above its 52-week low. (Many of the best selections will be 100 percent, 300 percent, or greater above their 52-week low before they emerge from a solid consolidation period and mount a large scale advance.)
+	C6: C >= WeekLow52 * 1.30
+
+	// 7. The current stock price is within at least 25 percent of its 52-week high (the closer to a new high the better).
+	C7: C >= WeekHigh52 * 0.75
+	
+	// 8. The relative strength ranking (as reported in Investor's Business Daily) is no less than 70, and preferably in the 80s or 90s, which will generally be the case with the better selections.
+	C8: IBDRS >= 70
+	
+Scan:
+	Filter: Not(IsNaN(Strength)) and C1 and C2 and C3 and C4 and C5 and C6 and C7 and C8
+	Strength: Strength
+	IBDRS: {#0} IBDRS
+	Sort: -Strength
+	Name: ?Name
+	Industry: ?Industry
